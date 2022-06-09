@@ -5,6 +5,7 @@ import org.apache.commons.logging.LogFactory;
 import edu.hawaii.its.api.type.AdminListsHolder;
 import edu.hawaii.its.api.type.Group;
 import edu.hawaii.its.api.type.Grouping;
+import edu.hawaii.its.api.type.Person;
 import edu.hawaii.its.api.type.SyncDestination;
 
 import edu.internet2.middleware.grouperClient.ws.StemScope;
@@ -25,8 +26,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service("groupingAssignmentService")
@@ -114,8 +117,16 @@ public class GroupingAssignmentServiceImpl implements GroupingAssignmentService 
         compositeGrouping.setBasis(groups.get(basis));
         compositeGrouping.setExclude(groups.get(exclude));
         compositeGrouping.setInclude(groups.get(include));
-        compositeGrouping.setComposite(groups.get(groupingPath));
+        //in person set where listed
+        Set<Person> set = new LinkedHashSet<>(compositeGrouping.getInclude().getMembers());
+        set.addAll(compositeGrouping.getBasis().getMembers());
+        Group testGroup = new Group();
+        for (Person person : set) {
+            testGroup.addMember(person);
+        }
+        compositeGrouping.setComposite(testGroup);
         compositeGrouping.setOwners(groups.get(owners));
+        helperService.setTheWhereListed(compositeGrouping.getBasis(), compositeGrouping.getInclude(), compositeGrouping.getExclude(), compositeGrouping.getComposite(), compositeGrouping.getOwners());
 
         return compositeGrouping;
     }
@@ -154,8 +165,16 @@ public class GroupingAssignmentServiceImpl implements GroupingAssignmentService 
         compositeGrouping.setBasis(groups.get(basis));
         compositeGrouping.setExclude(groups.get(exclude));
         compositeGrouping.setInclude(groups.get(include));
-        compositeGrouping.setComposite(groups.get(groupingPath));
+        //in person set where listed
+        Set<Person> set = new LinkedHashSet<>(compositeGrouping.getInclude().getMembers());
+        set.addAll(compositeGrouping.getBasis().getMembers());
+        Group testGroup = new Group();
+        for (Person person : set) {
+            testGroup.addMember(person);
+        }
+        compositeGrouping.setComposite(testGroup);
         compositeGrouping.setOwners(groups.get(owners));
+        helperService.setTheWhereListed(compositeGrouping.getBasis(), compositeGrouping.getInclude(), compositeGrouping.getExclude(), compositeGrouping.getComposite(), compositeGrouping.getOwners());
 
         return compositeGrouping;
     }
@@ -232,9 +251,9 @@ public class GroupingAssignmentServiceImpl implements GroupingAssignmentService 
         boolean isOptInOn = false;
         boolean isOptOutOn = false;
 
-        List<WsAttributeDefName> attributeDefNames =
-                Arrays.asList(grouperApiService.groupAttributeDefNames(ASSIGN_TYPE_GROUP, grouping.getPath())
-                        .getWsAttributeDefNames());
+        WsAttributeDefName[] attributeDefNames =
+                grouperApiService.groupAttributeDefNames(ASSIGN_TYPE_GROUP, grouping.getPath())
+                        .getWsAttributeDefNames();
         for (WsAttributeDefName defName : attributeDefNames) {
             String name = defName.getName();
             if (name.equals(OPT_IN)) {
