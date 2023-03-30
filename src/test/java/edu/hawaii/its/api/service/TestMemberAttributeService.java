@@ -1,25 +1,5 @@
 package edu.hawaii.its.api.service;
 
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
-import edu.hawaii.its.api.configuration.SpringBootWebApplication;
-import edu.hawaii.its.api.exception.AccessDeniedException;
-import edu.hawaii.its.api.type.GroupingPath;
-import edu.hawaii.its.api.type.Membership;
-import edu.hawaii.its.api.type.Person;
-import edu.hawaii.its.api.wrapper.Subject;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.core.env.Environment;
-import org.springframework.test.context.ActiveProfiles;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
@@ -27,6 +7,26 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.core.env.Environment;
+import org.springframework.test.context.ActiveProfiles;
+
+import edu.hawaii.its.api.configuration.SpringBootWebApplication;
+import edu.hawaii.its.api.exception.AccessDeniedException;
+import edu.hawaii.its.api.type.GroupingPath;
+import edu.hawaii.its.api.type.Membership;
+import edu.hawaii.its.api.type.Person;
+import edu.hawaii.its.api.wrapper.Subject;
 
 @ActiveProfiles("integrationTest")
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -53,6 +53,9 @@ public class TestMemberAttributeService {
 
     @Value("${groupings.api.test.usernames}")
     private List<String> TEST_USERNAMES;
+
+    @Value("${groupings.api.test.uhuuids}")
+    private List<String> TEST_UH_NUMBERS;
 
     @Value("${groupings.api.success}")
     private String SUCCESS;
@@ -140,7 +143,6 @@ public class TestMemberAttributeService {
             Person person = memberAttributeService.getMemberAttributes(ADMIN, testUsername);
             assertNotNull(person);
             assertEquals(testUsername, person.getUsername());
-            assertEquals(testUsername, person.getUhUuid());
         });
 
         String iamtst01 = TEST_USERNAMES.get(0);
@@ -189,7 +191,7 @@ public class TestMemberAttributeService {
                 .stream()
                 .map(subject -> subject.getUhUuid())
                 .collect(Collectors.toList());
-        assertEquals(TEST_USERNAMES, subjectsUhUuids);
+        assertEquals(TEST_UH_NUMBERS, subjectsUhUuids);
 
         String iamtst01 = TEST_USERNAMES.get(0);
         List<String> iamtst01List = new ArrayList<>();

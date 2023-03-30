@@ -13,10 +13,25 @@ package edu.hawaii.its.api.service;
  * works here: https://spaces.at.internet2.edu/display/Grouper/Grouper+Web+Services
  */
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.List;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
+
 import edu.hawaii.its.api.configuration.SpringBootWebApplication;
 import edu.hawaii.its.api.type.OptType;
 import edu.hawaii.its.api.type.Person;
@@ -43,21 +58,6 @@ import edu.internet2.middleware.grouperClient.ws.beans.WsHasMemberResult;
 import edu.internet2.middleware.grouperClient.ws.beans.WsHasMemberResults;
 import edu.internet2.middleware.grouperClient.ws.beans.WsSubject;
 import edu.internet2.middleware.grouperClient.ws.beans.WsSubjectLookup;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
-
-import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @ActiveProfiles("integrationTest")
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -304,7 +304,7 @@ public class TestGrouperApiServiceTutorial {
         memberResultsIsMember = Arrays.asList(hasMemberResultsIsMember.getResults());
         assertEquals(hasMemberResultsIsMember.getWsGroup().getName(), GROUPING_INCLUDE);
         assertEquals(memberResultsIsMember.size(), 1);
-        assertEquals(memberResultsIsMember.get(0).getWsSubject().getId(), TEST_USERNAMES.get(0));
+        assertEquals(memberResultsIsMember.get(0).getWsSubject().getIdentifierLookup(), TEST_USERNAMES.get(0));
         assertEquals(memberResultsIsMember.get(0).getResultMetadata().getResultCode(), "IS_MEMBER");
         // Using uh usernames (one that is not a member)
         hasMemberResultsNonMember =
@@ -313,7 +313,7 @@ public class TestGrouperApiServiceTutorial {
         memberResultsNonMember = Arrays.asList(hasMemberResultsNonMember.getResults());
         assertEquals(hasMemberResultsNonMember.getWsGroup().getName(), GROUPING_INCLUDE);
         assertEquals(memberResultsNonMember.size(), 1);
-        assertEquals(memberResultsNonMember.get(0).getWsSubject().getId(), TEST_USERNAMES.get(1));
+        assertEquals(memberResultsNonMember.get(0).getWsSubject().getIdentifierLookup(), TEST_USERNAMES.get(1));
         assertEquals(memberResultsNonMember.get(0).getResultMetadata().getResultCode(), "IS_NOT_MEMBER");
 
         // Using uh number with a person object (one that is a member)
@@ -342,7 +342,7 @@ public class TestGrouperApiServiceTutorial {
         memberResultsIsMember = Arrays.asList(hasMemberResultsIsMember.getResults());
         assertEquals(hasMemberResultsIsMember.getWsGroup().getName(), GROUPING_INCLUDE);
         assertEquals(memberResultsIsMember.size(), 1);
-        assertEquals(memberResultsIsMember.get(0).getWsSubject().getId(), TEST_USERNAMES.get(0));
+        assertEquals(memberResultsIsMember.get(0).getWsSubject().getIdentifierLookup(), TEST_USERNAMES.get(0));
         assertEquals(memberResultsIsMember.get(0).getResultMetadata().getResultCode(), "IS_MEMBER");
         // Using uh username with a person object (one that is not a member)
         hasMemberResultsNonMember = grouperApiService.hasMemberResults(
@@ -351,7 +351,7 @@ public class TestGrouperApiServiceTutorial {
         memberResultsNonMember = Arrays.asList(hasMemberResultsNonMember.getResults());
         assertEquals(hasMemberResultsNonMember.getWsGroup().getName(), GROUPING_INCLUDE);
         assertEquals(memberResultsNonMember.size(), 1);
-        assertEquals(memberResultsNonMember.get(0).getWsSubject().getId(), TEST_USERNAMES.get(1));
+        assertEquals(memberResultsNonMember.get(0).getWsSubject().getIdentifierLookup(), TEST_USERNAMES.get(1));
         assertEquals(memberResultsNonMember.get(0).getResultMetadata().getResultCode(), "IS_NOT_MEMBER");
 
         try {
@@ -496,7 +496,7 @@ public class TestGrouperApiServiceTutorial {
 
         List<WsGetGroupsResult> getGroupsResultUsername = Arrays.asList(uhUsernameResults.getResults());
         assertEquals(getGroupsResultUsername.size(), 1);
-        assertEquals(getGroupsResultUsername.get(0).getWsSubject().getId(), TEST_USERNAMES.get(0));
+        assertEquals(getGroupsResultUsername.get(0).getWsSubject().getIdentifierLookup(), TEST_USERNAMES.get(0));
 
         List<WsGetGroupsResult> getGroupsResultId = Arrays.asList(uhNumberResults.getResults());
         assertEquals(getGroupsResultId.size(), 1);
